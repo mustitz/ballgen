@@ -1,6 +1,9 @@
 # Soccer Ball Texture Generator
 
-Generate equirectangular textures of truncated icosahedron (soccer ball) patterns with proper great circle interpolation and polar distortion compensation.
+Generate equirectangular textures of truncated icosahedron (soccer ball) patterns with proper great circle interpolation and polar distortion compensation, plus 2D sprite rendering from 3D models.
+
+![Soccer Ball Sprites](examples/ball.all.png)
+*Example sprite sheet showing different camera angles and rotations*
 
 ## Features
 
@@ -10,6 +13,7 @@ Generate equirectangular textures of truncated icosahedron (soccer ball) pattern
 - **Customizable Colors**: Support for named colors, hex codes, and RGB values
 - **Configurable Parameters**: Size, thickness, interpolation quality, and colors
 - **3D Visualization**: View generated textures on a 3D sphere
+- **2D Sprite Generation**: Render sprites from different camera angles with transparency
 
 ## Installation
 
@@ -35,6 +39,9 @@ python gen_texture.py --bg-color blue --pentagon-color red -o colored_ball.png
 python gen_texture.py -s 4096 -t 8 -i 2000 -o high_quality.png
 ```
 
+![Soccer Ball Texture](examples/b-and-w.png)
+*An example of generated texture*
+
 ### View Texture on 3D Sphere
 
 ```bash
@@ -47,6 +54,18 @@ python view_texture.py my_soccer_ball.png -d 512
 # Low detail for performance
 python view_texture.py colored_ball.png -d 64
 ```
+
+### Generate 2D Sprites
+
+```bash
+# Generate 4x4 sprite sheet with different camera angles
+python make_sprites.py examples/b-and-w.png 4 -s 128x128 -o sprites/ball
+```
+
+This creates:
+- Individual sprites: `sprites/ball_01_01.png`, `sprites/ball_01_02.png`, etc.
+- Composite transparent: `sprites/ball.all.png`
+- Composite on green: `sprites/ball.green.png` (for checking transparency)
 
 ## Command Line Options
 
@@ -66,6 +85,16 @@ python view_texture.py colored_ball.png -d 64
 | Option | Description | Default |
 |--------|-------------|---------|
 | `texture_file` | Texture file to display (required) | - |
+| `-d, --detalization` | Sphere detail level | `256` |
+
+### make_sprites.py
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `texture_file` | Texture file to apply to sphere (required) | - |
+| `count` | Number of sprites to generate (NxN) (required) | - |
+| `-s, --size` | Sprite size as WIDTH or WIDTHxHEIGHT | `128x128` |
+| `-o, --output-prefix` | Output filename prefix | `sprite` |
 | `-d, --detalization` | Sphere detail level | `256` |
 
 ## Examples
