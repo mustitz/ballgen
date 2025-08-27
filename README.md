@@ -2,7 +2,7 @@
 
 Generate equirectangular textures of truncated icosahedron (soccer ball) patterns with proper great circle interpolation and polar distortion compensation, plus 2D sprite rendering from 3D models.
 
-![Soccer Ball Sprites](examples/ball.all.png)
+![Soccer Ball Sprites](examples/blue-ball.all.png)
 *Example sprite sheet showing different camera angles and rotations*
 
 ## Features
@@ -39,7 +39,7 @@ python gen_texture.py --bg-color blue --pentagon-color red -o colored_ball.png
 python gen_texture.py -s 4096 -t 8 -i 2000 -o high_quality.png
 ```
 
-![Soccer Ball Texture](examples/b-and-w.png)
+![Soccer Ball Texture](examples/white_and_blue.png)
 *An example of generated texture*
 
 ### View Texture on 3D Sphere
