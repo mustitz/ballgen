@@ -84,8 +84,12 @@ def lonlat_to_xy(lon_deg, lat_deg, width, height):
     v = max(0, min(height-1, v))
     return u, v
 
+def main(file_name=None, edge_thickness=EDGE_THICK, width=DEFAULT_WIDTH,
+         height=DEFAULT_HEIGHT, bg_color=DEFAULT_BG_COLOR,
+         pentagon_color=DEFAULT_PENTAGON_COLOR, edge_color=None,
+         interpolation_points=INTERPOLATION_POINTS, lat_rotation=DEFAULT_LAT_ROTATION,
+         lon_rotation=DEFAULT_LON_ROTATION):
 
-def main(file_name=None, edge_thickness=EDGE_THICK, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT, bg_color=DEFAULT_BG_COLOR, pentagon_color=DEFAULT_PENTAGON_COLOR, edge_color=None, interpolation_points=INTERPOLATION_POINTS, lat_rotation=DEFAULT_LAT_ROTATION, lon_rotation=DEFAULT_LON_ROTATION):
     # Convert color names to RGB tuples
     bg_rgb = ImageColor.getrgb(bg_color)
     pentagon_rgb = ImageColor.getrgb(pentagon_color)
