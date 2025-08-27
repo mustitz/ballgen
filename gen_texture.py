@@ -85,10 +85,11 @@ def lonlat_to_xy(lon_deg, lat_deg, width, height):
     return u, v
 
 
-def main(file_name=None, edge_thickness=EDGE_THICK, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT, bg_color=DEFAULT_BG_COLOR, pentagon_color=DEFAULT_PENTAGON_COLOR, interpolation_points=INTERPOLATION_POINTS, lat_rotation=DEFAULT_LAT_ROTATION, lon_rotation=DEFAULT_LON_ROTATION):
+def main(file_name=None, edge_thickness=EDGE_THICK, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT, bg_color=DEFAULT_BG_COLOR, pentagon_color=DEFAULT_PENTAGON_COLOR, edge_color=None, interpolation_points=INTERPOLATION_POINTS, lat_rotation=DEFAULT_LAT_ROTATION, lon_rotation=DEFAULT_LON_ROTATION):
     # Convert color names to RGB tuples
     bg_rgb = ImageColor.getrgb(bg_color)
     pentagon_rgb = ImageColor.getrgb(pentagon_color)
+    edge_rgb = ImageColor.getrgb(edge_color if edge_color else pentagon_color)
 
     # Create background
     img = Image.new("RGB", (width, height), bg_rgb)
@@ -171,7 +172,7 @@ def main(file_name=None, edge_thickness=EDGE_THICK, width=DEFAULT_WIDTH, height=
                 lat_adjusted_radius = int(edge_thickness * lat_factor)
 
                 # Draw circle at each point
-                draw.ellipse((px-lat_adjusted_radius, py-edge_thickness, px+lat_adjusted_radius, py+edge_thickness), fill=pentagon_rgb)
+                draw.ellipse((px-lat_adjusted_radius, py-edge_thickness, px+lat_adjusted_radius, py+edge_thickness), fill=edge_rgb)
 
     # Flood fill pentagons with black
     for face in FACES:
@@ -239,6 +240,8 @@ if __name__ == '__main__':
                        help=f'Background color (default: {DEFAULT_BG_COLOR})')
     parser.add_argument('--pentagon-color', default=DEFAULT_PENTAGON_COLOR,
                        help=f'Pentagon color (default: {DEFAULT_PENTAGON_COLOR})')
+    parser.add_argument('--edge-color', default=None,
+                       help='Edge color (default: same as pentagon color)')
     parser.add_argument('-i', '--interpolation', type=int, default=INTERPOLATION_POINTS,
                        help=f'Interpolation points for smooth edges (default: {INTERPOLATION_POINTS})')
     parser.add_argument('--lat-rotation', type=int, default=DEFAULT_LAT_ROTATION,
@@ -254,4 +257,4 @@ if __name__ == '__main__':
         width = int(args.size)
         height = width // 2
 
-    main(args.output, args.thickness, width, height, args.bg_color, args.pentagon_color, args.interpolation, args.lat_rotation, args.lon_rotation)
+    main(args.output, args.thickness, width, height, args.bg_color, args.pentagon_color, args.edge_color, args.interpolation, args.lat_rotation, args.lon_rotation)

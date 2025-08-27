@@ -78,6 +78,7 @@ This creates:
 | `-t, --thickness` | Edge thickness in pixels | `2` |
 | `--bg-color` | Background color | `white` |
 | `--pentagon-color` | Pentagon color | `black` |
+| `--edge-color` | Edge color | Same as pentagon color |
 | `-i, --interpolation` | Interpolation points for smooth edges | `1000` |
 
 ### view_texture.py
@@ -114,6 +115,9 @@ python gen_texture.py -s 512x256 -t 1 -i 50 -o test.png
 
 # Custom colors with hex codes
 python gen_texture.py --bg-color "#FF6B6B" --pentagon-color "#4ECDC4" -o custom.png
+
+# Different edge and pentagon colors
+python gen_texture.py --bg-color white --pentagon-color blue --edge-color black -o colored_edges.png
 ```
 
 ## Technical Details
