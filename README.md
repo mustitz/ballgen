@@ -19,9 +19,6 @@ Generate equirectangular textures of truncated icosahedron (soccer ball) pattern
 ![fig](paper/figures/fig6_multipoles.png)
 
 
-![Soccer Ball Sprites](examples/blue-ball.all.png)
-*Example sprite sheet showing different camera angles and rotations*
-
 ## Features
 
 - **Accurate Geometry**: Uses mathematically correct truncated icosahedron vertex coordinates
@@ -32,57 +29,6 @@ Generate equirectangular textures of truncated icosahedron (soccer ball) pattern
 - **3D Visualization**: View generated textures on a 3D sphere
 - **2D Sprite Generation**: Render sprites from different camera angles with transparency
 
-## Installation
-
-```bash
-pip install pillow pyvista numpy
-```
-
-## Usage
-
-### Generate Texture
-
-```bash
-# Basic usage (generates soccer_ball_texture.png)
-python gen_texture.py
-
-# Custom size and output
-python gen_texture.py -s 2048x1024 -o my_soccer_ball.png
-
-# Colored soccer ball
-python gen_texture.py --bg-color blue --pentagon-color red -o colored_ball.png
-
-# High quality with thick edges
-python gen_texture.py -s 4096 -t 8 -i 2000 -o high_quality.png
-```
-
-![Soccer Ball Texture](examples/white_and_blue.png)
-*An example of generated texture*
-
-### View Texture on 3D Sphere
-
-```bash
-# View with default detail level
-python view_texture.py soccer_ball_texture.png
-
-# High detail visualization
-python view_texture.py my_soccer_ball.png -d 512
-
-# Low detail for performance
-python view_texture.py colored_ball.png -d 64
-```
-
-### Generate 2D Sprites
-
-```bash
-# Generate 4x4 sprite sheet with different camera angles
-python make_sprites.py examples/b-and-w.png 4 -s 128x128 -o sprites/ball
-```
-
-This creates:
-- Individual sprites: `sprites/ball_01_01.png`, `sprites/ball_01_02.png`, etc.
-- Composite transparent: `sprites/ball.all.png`
-- Composite on green: `sprites/ball.green.png` (for checking transparency)
 
 ## New: ball types, matplotlib plots, no PyVista
 
