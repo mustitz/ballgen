@@ -1,0 +1,2 @@
+default:
+	latexmk -pdf trionda
