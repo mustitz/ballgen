@@ -1,6 +1,18 @@
-# Soccer Ball Texture Generator
+# Trionda Soccer Ball Generator
 
-Generate equirectangular textures of truncated icosahedron (soccer ball) patterns with proper great circle interpolation and polar distortion compensation, plus 2D sprite rendering from 3D models.
+https://www.scientificamerican.com/article/the-surprising-math-and-physics-behind-the-2026-trionda-world-cup-soccer-ball/
+
+
+![fig](paper/figures/chiral_tilings.png)
+
+![fig](paper/figures/grid_3d_gnomonic.png)
+
+![fig](paper/figures/grid_3d_snyder.png)
+
+![fig](paper/figures/grid_map_gnomonic.png)
+
+![fig](paper/figures/grid_map_snyder.png)
+
 
 ![fig](paper/figures/fig1_construction_A.png)
 
@@ -19,21 +31,10 @@ Generate equirectangular textures of truncated icosahedron (soccer ball) pattern
 ![fig](paper/figures/fig6_multipoles.png)
 
 
-## Features
 
-- **Accurate Geometry**: Uses mathematically correct truncated icosahedron vertex coordinates
-- **Great Circle Interpolation**: Smooth edge curves using spherical linear interpolation (SLERP)
-- **Polar Distortion Compensation**: Adjusts line thickness near poles for equirectangular projection
-- **Customizable Colors**: Support for named colors, hex codes, and RGB values
-- **Configurable Parameters**: Size, thickness, interpolation quality, and colors
-- **3D Visualization**: View generated textures on a 3D sphere
-- **2D Sprite Generation**: Render sprites from different camera angles with transparency
+## Ball types, matplotlib plots
 
-
-## New: ball types, matplotlib plots, no PyVista
-
-These tools sit next to the original scripts and do not change them. Panels are assigned per pixel
-from a polyhedron description (`balls.py`), so there is no flood fill, no leaking and uniform seam
+Panels are assigned per pixel from a polyhedron description (`balls.py`), so there is no flood fill, no leaking and uniform seam
 width everywhere on the sphere. Needs only `numpy`, `pillow` and `matplotlib`.
 
 ```bash
@@ -98,58 +99,6 @@ python make_data.py && python make_tables.py && python make_figures.py   # data/
 latexmk -pdf trionda
 ```
 
-## Command Line Options
-
-### gen_texture.py
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `-o, --output` | Output filename | `soccer_ball_texture.png` |
-| `-s, --size` | Size as WIDTH or WIDTHxHEIGHT | `1024x512` |
-| `-t, --thickness` | Edge thickness in pixels | `2` |
-| `--bg-color` | Background color | `white` |
-| `--pentagon-color` | Pentagon color | `black` |
-| `--edge-color` | Edge color | Same as pentagon color |
-| `-i, --interpolation` | Interpolation points for smooth edges | `1000` |
-
-### view_texture.py
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `texture_file` | Texture file to display (required) | - |
-| `-d, --detalization` | Sphere detail level | `256` |
-
-### make_sprites.py
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `texture_file` | Texture file to apply to sphere (required) | - |
-| `count` | Number of sprites to generate (NxN) (required) | - |
-| `-s, --size` | Sprite size as WIDTH or WIDTHxHEIGHT | `128x128` |
-| `-o, --output-prefix` | Output filename prefix | `sprite` |
-| `-d, --detalization` | Sphere detail level | `256` |
-
-## Examples
-
-```bash
-# Traditional soccer ball (white background, black pentagons)
-python gen_texture.py -o traditional.png
-
-# Inverted colors
-python gen_texture.py --bg-color black --pentagon-color white -o inverted.png
-
-# High resolution for printing
-python gen_texture.py -s 4096x2048 -t 16 -o print_quality.png
-
-# Fast generation for testing
-python gen_texture.py -s 512x256 -t 1 -i 50 -o test.png
-
-# Custom colors with hex codes
-python gen_texture.py --bg-color "#FF6B6B" --pentagon-color "#4ECDC4" -o custom.png
-
-# Different edge and pentagon colors
-python gen_texture.py --bg-color white --pentagon-color blue --edge-color black -o colored_edges.png
-```
 
 ## Technical Details
 
@@ -174,25 +123,3 @@ Edge lines follow great circles (shortest paths on sphere) using:
 - Haversine formula for distance calculation
 - Configurable point density for quality vs. performance
 
-## Color Formats
-
-Supported color formats:
-- **Named colors**: `white`, `black`, `red`, `blue`, `green`, etc.
-- **Hex codes**: `#FFFFFF`, `#000000`, `#FF0000`
-- **RGB strings**: `rgb(255,255,255)`
-
-## Troubleshooting
-
-### Monotone Ball (Pentagon Fill)
-
-If you see a solid color ball instead of black pentagons, the interpolation points are too low:
-
-**Problem**: With very few interpolation points (e.g., `-i 5`), edges become disconnected dots instead of continuous lines. This creates gaps that allow flood fill to leak into adjacent areas, filling the entire texture.
-
-**Solutions**:
-- **Increase interpolation points**: Use `-i 100` or higher for proper edge continuity
-- **Increase thickness**: It also may work
-
-## License
-
-MIT License - feel free to use in your projects!
