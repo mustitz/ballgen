@@ -28,7 +28,7 @@ def test_polygon_vertex_counts(name):
     sides = sorted(len(f) for f in b.face_vertices())
     expected = {"classic": [5] * 12 + [6] * 20, "panel-12": [5] * 12, "panel-14": [4] * 6 + [6] * 8,
                 "panel-20": [3] * 20, "panel-6": [4] * 6, "panel-8": [3] * 8,
-                "tetra-4": [3] * 4, "cube-6": [4] * 6, "octa-8": [3] * 8, "dodeca-12": [5] * 12, "icosa-20": [3] * 20}
+                "tetra-4": [3] * 4, "cube-6": [4] * 6, "octa-8": [3] * 8, "dodeca-12": [5] * 12, "icosa-20": [3] * 20, "goldberg-42": [5] * 12 + [6] * 30}
     key = "classic" if name.startswith("classic") else name.replace("-chiral", "")
     key = "tetra-4" if key == "trionda" else key
     assert sides == expected[key]
