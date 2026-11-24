@@ -636,6 +636,44 @@ def icosa_20_chiral() -> Ball:
                        "20 chiral panels (icosahedron topology, rotation group I)", tilt_deg=FAMILY_TILT_DEG)
 
 
+# --------------------------------------------------------------------------
+# Goldberg-style 42-panel ball  (GP(2,0): 12 pentagons + 30 hexagons, icosahedral symmetry)
+# --------------------------------------------------------------------------
+
+# Pentagon plane height relative to the hexagons (=1) that makes all 42 panels exactly equal in area.
+GOLDBERG42_PENTAGON_HEIGHT = 0.9927841249483957
+
+
+def poly_goldberg42(pentagon_height: float = GOLDBERG42_PENTAGON_HEIGHT):
+    """Centres at the 12 icosahedron vertices (pentagons) and 30 edge midpoints (hexagons)."""
+    # take the vertices from poly_icosahedron() so the frame matches the icosahedral flow of icosa-20-chiral
+    ax = icosa_axes_of(poly_icosahedron())
+    V = np.vstack([ax, -ax])
+    mids = [unit(V[i] + V[j]) for i, j in itertools.combinations(range(12), 2)
+            if abs(V[i] @ V[j] - 1 / math.sqrt(5)) < 1e-9]
+    n = np.vstack([V, np.array(mids)])
+    h = np.concatenate([np.full(12, pentagon_height), np.ones(30)])
+    k = np.array([0] * 12 + [1] * 30)
+    return n, h, k
+
+
+@register
+def goldberg_42() -> Ball:
+    return _ball("goldberg-42", "42 straight equal-area panels (Goldberg GP(2,0): 12 pentagons, 30 hexagons, I_h)",
+                 poly_goldberg42(), _look(["#d52b1e", "#f2f2f2"]), kind_names=("pentagon", "hexagon"))
+
+
+@register
+def goldberg_42_chiral() -> Ball:
+    """Goldberg-42 pushed through the same icosahedral flow as icosa-20-chiral (same group I, same invariant f)."""
+    ball = _ball("goldberg-42-chiral",
+                 "42 chiral equal-area panels (Goldberg topology, rotation group I; flow of icosa-20-chiral)",
+                 poly_goldberg42(), _look(["#d52b1e", "#f2f2f2"]), kind_names=("pentagon", "hexagon"))
+    ico = icosa_20_chiral()
+    ball.warp, ball.tau, ball.edge_tilt = ico.warp, ico.tau, ico.edge_tilt
+    return ball
+
+
 def _kinds_distinct(poly):
     n, h, _ = poly
     return n, h, np.arange(len(n)) % 6
