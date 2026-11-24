@@ -1,0 +1,12 @@
+{
+ "chirality_lowers_cv_all_families": true,
+ "goldberg_lowest_cv": true,
+ "classic_second_lowest_cv": true,
+ "cv_decreases_with_panels_in_Ih": true,
+ "trionda_below_tetra_all_sensitivity": true,
+ "tau2_below_trionda_all_sensitivity": true,
+ "classic_below_trionda_all_sensitivity": true,
+ "cube_vs_tetra_order_flips": true,
+ "cv_monotone_decreasing_in_tau_beyond_0.3": true,
+ "seam_length_monotone_in_tau": true
+}

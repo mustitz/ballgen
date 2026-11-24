@@ -1,124 +1,106 @@
-# Soccer Ball Texture Generator
+# Trionda Soccer Ball Generator
 
-Generate equirectangular textures of truncated icosahedron (soccer ball) patterns with proper great circle interpolation and polar distortion compensation, plus 2D sprite rendering from 3D models.
+https://www.scientificamerican.com/article/the-surprising-math-and-physics-behind-the-2026-trionda-world-cup-soccer-ball/
 
-![Soccer Ball Sprites](examples/blue-ball.all.png)
-*Example sprite sheet showing different camera angles and rotations*
+see also: https://github.com/brentharts/hexasphere/
 
-## Features
 
-- **Accurate Geometry**: Uses mathematically correct truncated icosahedron vertex coordinates
-- **Great Circle Interpolation**: Smooth edge curves using spherical linear interpolation (SLERP)
-- **Polar Distortion Compensation**: Adjusts line thickness near poles for equirectangular projection
-- **Customizable Colors**: Support for named colors, hex codes, and RGB values
-- **Configurable Parameters**: Size, thickness, interpolation quality, and colors
-- **3D Visualization**: View generated textures on a 3D sphere
-- **2D Sprite Generation**: Render sprites from different camera angles with transparency
+![fig](paper/figures/chiral_tilings.png)
 
-## Installation
+![fig](paper/figures/grid_3d_gnomonic.png)
 
-```bash
-pip install pillow pyvista numpy
-```
+![fig](paper/figures/grid_3d_snyder.png)
 
-## Usage
+![fig](paper/figures/grid_map_gnomonic.png)
 
-### Generate Texture
+![fig](paper/figures/grid_map_snyder.png)
 
-```bash
-# Basic usage (generates soccer_ball_texture.png)
-python gen_texture.py
 
-# Custom size and output
-python gen_texture.py -s 2048x1024 -o my_soccer_ball.png
+![fig](paper/figures/fig1_construction_A.png)
 
-# Colored soccer ball
-python gen_texture.py --bg-color blue --pentagon-color red -o colored_ball.png
+![fig](paper/figures/fig4_projections.png)
 
-# High quality with thick edges
-python gen_texture.py -s 4096 -t 8 -i 2000 -o high_quality.png
-```
+![fig](paper/figures/fig7_exposure_maps.png)
 
-![Soccer Ball Texture](examples/white_and_blue.png)
-*An example of generated texture*
+![fig](paper/figures/fig2_flow.png)
 
-### View Texture on 3D Sphere
+![fig](paper/figures/fig5_tau_dependence.png)
+
+![fig](paper/figures/fig8_gallery.png)
+
+![fig](paper/figures/fig3_tau_sweep.png)
+
+![fig](paper/figures/fig6_multipoles.png)
+
+
+
+## Ball types, matplotlib plots
+
+Panels are assigned per pixel from a polyhedron description (`balls.py`), so there is no flood fill, no leaking and uniform seam
+width everywhere on the sphere. Needs only `numpy`, `pillow` and `matplotlib`.
 
 ```bash
-# View with default detail level
-python view_texture.py soccer_ball_texture.png
+python gen_ball.py --list                       # available ball types
+python gen_ball.py panel-6 -s 2048 -o p6.png    # texture for any type (same convention as gen_texture.py)
+python gen_ball.py classic-32 --pentagon-color blue --bg-color white --edge-color black
+python gen_ball.py panel-20 --palette viridis   # every panel its own colour
 
-# High detail visualization
-python view_texture.py my_soccer_ball.png -d 512
+python make_sprites_mpl.py panel-8 4 -s 128 -o sprites/p8       # sprite sheet, no PyVista
+python make_sprites_mpl.py examples/b-and-w.png 4 -o sprites/b  # existing textures work too
+python view_ball.py panel-14                    # interactive matplotlib viewer with sliders
 
-# Low detail for performance
-python view_texture.py colored_ball.png -d 64
+python plot_ball.py geometry    panel-14 -o geo.png   # 3D panels + seams
+python plot_ball.py projections classic-32 -o proj.png# equirectangular + Tissot circles, Mollweide, 2 views
+python plot_ball.py analysis    panel-6  -o ana.png   # panel areas, seam density vs latitude, metrics
+python plot_ball.py compare     -o cmp.png            # all types side by side
+python plot_ball.py gallery     -o gallery.png
+python ball_stats.py                                  # metrics table
+python -m pytest tests
 ```
 
-### Generate 2D Sprites
+| Type | Layout |
+|------|--------|
+| `classic-32`, `-red`, `-retro` | truncated icosahedron, 12 pentagons + 20 hexagons |
+| `panel-6` | 6 swirled panels (cube topology) |
+| `panel-8` | 8 twisted panels (octahedron), two alternating colours |
+| `panel-12` | 12 pentagons (dodecahedron) |
+| `panel-14`, `panel-14-twist` | 6 squares + 8 hexagons (truncated octahedron) |
+| `panel-20` | 20 swirled panels (icosahedron) |
+
+The modern layouts are topological approximations (panel count and symmetry), not copies of any
+manufacturer's template. The swirl is a rotation about an axis by an angle proportional to height
+along it. It preserves panel area.
+
+**Adding a ball type:** write a function in `balls.py` that returns `_ball(name, description, (normals,
+heights, kinds), look, twist=...)` and decorate it with `@register`. Plots, sprites, textures and
+statistics pick it up automatically.
+
+**Statistics** are on the unit sphere. Seam length is exact (walks the real edge curves, twist included).
+"Largest seam-free cap" is reported only for untwisted balls.
+
+## Trionda model and the paper
+
+`balls.py` also contains an exact model of a four-panel **chiral tetrahedral** ball (`trionda`) and chiral versions of the other
+Platonic layouts. Panels are the pre-images of a straight partition under the flow of `p x grad f` for a rotation-group-invariant
+`f` (here `xyz` for the tetrahedron), so the panels are congruent, equal in area and share their seams exactly.
 
 ```bash
-# Generate 4x4 sprite sheet with different camera angles
-python make_sprites.py examples/b-and-w.png 4 -s 128x128 -o sprites/ball
+python gen_ball.py trionda -s 2048 -o trionda.png
+python make_sprites_mpl.py trionda 4 -s 128 -o sprites/trionda
+python ball_metrics.py classic-32 tetra-4 trionda    # symmetry group, lowest multipole, exposure proxy
 ```
 
-This creates:
-- Individual sprites: `sprites/ball_01_01.png`, `sprites/ball_01_02.png`, etc.
-- Composite transparent: `sprites/ball.all.png`
-- Composite on green: `sprites/ball.green.png` (for checking transparency)
+`trionda_barycentric.py` is the original barycentric edge-deformation script, kept unchanged. **It does not tile the sphere**:
+with `amp=0.21, harmonic=0.035` about 11.7% of the sphere is covered by no panel (see `paper/`).
 
-## Command Line Options
-
-### gen_texture.py
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `-o, --output` | Output filename | `soccer_ball_texture.png` |
-| `-s, --size` | Size as WIDTH or WIDTHxHEIGHT | `1024x512` |
-| `-t, --thickness` | Edge thickness in pixels | `2` |
-| `--bg-color` | Background color | `white` |
-| `--pentagon-color` | Pentagon color | `black` |
-| `--edge-color` | Edge color | Same as pentagon color |
-| `-i, --interpolation` | Interpolation points for smooth edges | `1000` |
-
-### view_texture.py
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `texture_file` | Texture file to display (required) | - |
-| `-d, --detalization` | Sphere detail level | `256` |
-
-### make_sprites.py
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `texture_file` | Texture file to apply to sphere (required) | - |
-| `count` | Number of sprites to generate (NxN) (required) | - |
-| `-s, --size` | Sprite size as WIDTH or WIDTHxHEIGHT | `128x128` |
-| `-o, --output-prefix` | Output filename prefix | `sprite` |
-| `-d, --detalization` | Sphere detail level | `256` |
-
-## Examples
+`paper/` holds the LaTeX paper. Every number and figure is generated by code:
 
 ```bash
-# Traditional soccer ball (white background, black pentagons)
-python gen_texture.py -o traditional.png
-
-# Inverted colors
-python gen_texture.py --bg-color black --pentagon-color white -o inverted.png
-
-# High resolution for printing
-python gen_texture.py -s 4096x2048 -t 16 -o print_quality.png
-
-# Fast generation for testing
-python gen_texture.py -s 512x256 -t 1 -i 50 -o test.png
-
-# Custom colors with hex codes
-python gen_texture.py --bg-color "#FF6B6B" --pentagon-color "#4ECDC4" -o custom.png
-
-# Different edge and pentagon colors
-python gen_texture.py --bg-color white --pentagon-color blue --edge-color black -o colored_edges.png
+cd paper
+python make_data.py && python make_tables.py && python make_figures.py   # data/, tables/, figures/
+latexmk -pdf trionda
 ```
+
 
 ## Technical Details
 
@@ -143,25 +125,3 @@ Edge lines follow great circles (shortest paths on sphere) using:
 - Haversine formula for distance calculation
 - Configurable point density for quality vs. performance
 
-## Color Formats
-
-Supported color formats:
-- **Named colors**: `white`, `black`, `red`, `blue`, `green`, etc.
-- **Hex codes**: `#FFFFFF`, `#000000`, `#FF0000`
-- **RGB strings**: `rgb(255,255,255)`
-
-## Troubleshooting
-
-### Monotone Ball (Pentagon Fill)
-
-If you see a solid color ball instead of black pentagons, the interpolation points are too low:
-
-**Problem**: With very few interpolation points (e.g., `-i 5`), edges become disconnected dots instead of continuous lines. This creates gaps that allow flood fill to leak into adjacent areas, filling the entire texture.
-
-**Solutions**:
-- **Increase interpolation points**: Use `-i 100` or higher for proper edge continuity
-- **Increase thickness**: It also may work
-
-## License
-
-MIT License - feel free to use in your projects!
