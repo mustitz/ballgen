@@ -2,6 +2,8 @@
 
 https://www.scientificamerican.com/article/the-surprising-math-and-physics-behind-the-2026-trionda-world-cup-soccer-ball/
 
+see also: https://github.com/brentharts/hexasphere/
+
 
 ![fig](paper/figures/chiral_tilings.png)
 
