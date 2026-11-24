@@ -2,6 +2,23 @@
 
 Generate equirectangular textures of truncated icosahedron (soccer ball) patterns with proper great circle interpolation and polar distortion compensation, plus 2D sprite rendering from 3D models.
 
+![fig](paper/figures/fig1_construction_A.png)
+
+![fig](paper/figures/fig4_projections.png)
+
+![fig](paper/figures/fig7_exposure_maps.png)
+
+![fig](paper/figures/fig2_flow.png)
+
+![fig](paper/figures/fig5_tau_dependence.png)
+
+![fig](paper/figures/fig8_gallery.png)
+
+![fig](paper/figures/fig3_tau_sweep.png)
+
+![fig](paper/figures/fig6_multipoles.png)
+
+
 ![Soccer Ball Sprites](examples/blue-ball.all.png)
 *Example sprite sheet showing different camera angles and rotations*
 
