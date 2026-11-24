@@ -114,6 +114,8 @@ def family(quick):
         ("dodeca-12-chiral", balls.get_ball("dodeca-12-chiral"), "I"),
         ("icosa-20", balls.get_ball("icosa-20"), "I_h"),
         ("icosa-20-chiral", balls.get_ball("icosa-20-chiral"), "I"),
+        ("goldberg-42", balls.get_ball("goldberg-42"), "I_h"),
+        ("goldberg-42-chiral", balls.get_ball("goldberg-42-chiral"), "I"),
         ("classic-32", balls.get_ball("classic-32"), "I_h"),
     ]
     out = []

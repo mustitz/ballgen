@@ -22,6 +22,7 @@ LABEL = {"tetra-4": ("tetra-4", "$T_d$"), "trionda": (r"\textbf{Trionda model} (
          "octa-8": ("octa-8", "$O_h$"), "octa-8-chiral": ("octa-8, chiral", "$O$"),
          "dodeca-12": ("dodeca-12", "$I_h$"), "dodeca-12-chiral": ("dodeca-12, chiral", "$I$"),
          "icosa-20": ("icosa-20", "$I_h$"), "icosa-20-chiral": ("icosa-20, chiral", "$I$"),
+         "goldberg-42": ("goldberg-42 (12 pent., 30 hex.)", "$I_h$"), "goldberg-42-chiral": ("goldberg-42, chiral", "$I$"),
          "classic-32": ("classic-32 (trunc.\\ icosahedron)", "$I_h$")}
 ORDER = {"T": 12, "T_d": 12, "O": 24, "O_h": 24, "I": 60, "I_h": 60}
 
@@ -43,8 +44,11 @@ claims = {}
 cvs = {k: r["exposure"]["cv"] for k, r in fam.items()}
 claims["chirality_lowers_cv_all_families"] = all(cvs[a] < cvs[b] for a, b in [
     ("trionda-20", "tetra-4"), ("cube-6-chiral", "cube-6"), ("octa-8-chiral", "octa-8"),
-    ("dodeca-12-chiral", "dodeca-12"), ("icosa-20-chiral", "icosa-20")])
-claims["classic_lowest_cv"] = all(cvs["classic-32"] < v for k, v in cvs.items() if k != "classic-32")
+    ("dodeca-12-chiral", "dodeca-12"), ("icosa-20-chiral", "icosa-20"),
+    ("goldberg-42-chiral", "goldberg-42")])
+claims["goldberg_lowest_cv"] = all(cvs["goldberg-42"] < v for k, v in cvs.items() if not k.startswith("goldberg-42"))
+claims["classic_second_lowest_cv"] = all(cvs["classic-32"] < v for k, v in cvs.items() if k != "classic-32" and not k.startswith("goldberg-42"))
+claims["cv_decreases_with_panels_in_Ih"] = cvs["dodeca-12"] > cvs["icosa-20"] > cvs["classic-32"] > cvs["goldberg-42"]
 cv = sens["cv"]
 n_sets = len(sens["seps"]) * len(sens["sigmas"])
 claims["trionda_below_tetra_all_sensitivity"] = all(cv["trionda"][i][j] < cv["tetra-4"][i][j]
@@ -63,13 +67,13 @@ json.dump(claims, open(os.path.join(HERE, "data", "claims.json"), "w"), indent=1
 # ---- family table
 rows = []
 for key in ["tetra-4", "trionda", "trionda-20", "cube-6", "cube-6-chiral", "octa-8", "octa-8-chiral",
-            "dodeca-12", "dodeca-12-chiral", "icosa-20", "icosa-20-chiral", "classic-32"]:
+            "dodeca-12", "dodeca-12-chiral", "icosa-20", "icosa-20-chiral", "goldberg-42", "goldberg-42-chiral", "classic-32"]:
     r = fam[key]
     lab, grp = LABEL[key]
     sym = f"{grp} ({r['rotations']}" + (")" if r["chiral"] else f"+{r['improper']})")
     rows.append(f"{lab} & {r['panels']} & {sym} & {r['seam_length']:.2f} & {r['seam_per_area']:.3f} & "
                 f"{r['lowest_multipole']} & {r['exposure']['cv']:.3f} & {r['mean_abs_kg']:.2f} \\\\")
-    if key in ("trionda-20", "cube-6-chiral" if False else "trionda-20", "octa-8-chiral", "dodeca-12-chiral", "icosa-20-chiral") and key != "classic-32":
+    if key in ("trionda-20", "cube-6-chiral" if False else "trionda-20", "octa-8-chiral", "dodeca-12-chiral", "icosa-20-chiral", "goldberg-42-chiral") and key != "classic-32":
         rows.append(r"\addlinespace")
 open(os.path.join(HERE, "tables", "family.tex"), "w").write(
     "\\begin{tabular}{@{}lrlrrrrr@{}}\n\\toprule\n"
@@ -106,7 +110,8 @@ m = {
  "tiltDefault": f"{math.degrees(math.atan(math.tanh(0.9))):.1f}",
  "vertexAngleDefault": f"{math.degrees(2*0.9/math.sqrt(3)):.1f}",
  "expTetra": f"{cvs['tetra-4']:.3f}", "expTrionda": f"{cvs['trionda']:.3f}", "expTrionTwenty": f"{cvs['trionda-20']:.3f}",
- "expClassic": f"{cvs['classic-32']:.3f}", "expTauTwo": f"{t20['exposure_cv']:.3f}", "LRatioTauTwo": f"{t20['ratio']:.2f}",
+ "expClassic": f"{cvs['classic-32']:.3f}", "expGoldberg": f"{cvs['goldberg-42']:.3f}", "expGoldbergChiral": f"{cvs['goldberg-42-chiral']:.3f}",
+ "expRatioGoldberg": f"{cvs['trionda']/cvs['goldberg-42']:.0f}", "expTauTwo": f"{t20['exposure_cv']:.3f}", "LRatioTauTwo": f"{t20['ratio']:.2f}",
  "expRatioClassic": f"{cvs['trionda']/cvs['classic-32']:.1f}",
  "kgMeanDefault": f"{tr['mean_abs_kg']:.2f}",
  "famTilt": "20",

@@ -242,8 +242,9 @@ def fig6():
     fam = {r["key"]: r for r in load("family.json")}
     rows = [("tetra-4", "T", "tetra-4 ($T_d$)", BLUE), ("trionda", "T", "Trionda ($T$)", BLUE),
             ("cube-6", "O", "cube-6 ($O_h$)", ORANGE), ("cube-6-chiral", "O", "cube-6-chiral ($O$)", ORANGE),
-            ("classic-32", "I", "classic-32 ($I_h$)", AQUA), ("icosa-20-chiral", "I", "icosa-20-chiral ($I$)", AQUA)]
-    fig, ax = plt.subplots(figsize=(6.2, 2.7))
+            ("classic-32", "I", "classic-32 ($I_h$)", AQUA), ("icosa-20-chiral", "I", "icosa-20-chiral ($I$)", AQUA),
+            ("goldberg-42-chiral", "I", "goldberg-42-chiral ($I$)", AQUA)]
+    fig, ax = plt.subplots(figsize=(6.2, 3.0))
     for r, (key, grp, label, col) in enumerate(rows):
         y = len(rows) - 1 - r
         dims = invariant_dims(grp)
@@ -295,8 +296,8 @@ def fig7():
 # --------------------------------------------------------------------------- fig8: gallery
 def fig8():
     keys = ["tetra-4", "trionda", "cube-6", "cube-6-chiral", "octa-8", "octa-8-chiral",
-            "panel-12", "dodeca-12-chiral", "icosa-20", "icosa-20-chiral", "classic-32"]
-    fig, axes = plt.subplots(3, 4, figsize=(7.2, 5.5))
+            "panel-12", "dodeca-12-chiral", "icosa-20", "icosa-20-chiral", "classic-32", "goldberg-42", "goldberg-42-chiral"]
+    fig, axes = plt.subplots(3, 5, figsize=(8.6, 5.3))
     for ax in axes.ravel():
         ax.axis("off")
     for ax, k in zip(axes.ravel(), keys):
