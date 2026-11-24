@@ -51,9 +51,9 @@ congruent panels of area $\pi$ with exactly shared seams. The model is chiral fo
 edge midpoint at the angle $\arctan\tanh\tau$ to the straight edge and swirl around each vertex at angular rate $2/\sqrt3$.
 Using representation theory we show that the lowest multipole of the seam density that the symmetry group permits is
 $\ell=3$ for tetrahedral, $4$ for octahedral and $6$ for icosahedral layouts, and we confirm this numerically, together
-with the symmetry-group orders ($12$ versus $60$), for twelve layouts including a truncated icosahedron. A purely
+with the symmetry-group orders ($12$ versus $60$), for fourteen layouts including a truncated icosahedron and a 42-panel Goldberg ball. A purely
 geometric proxy for the seam a flow meets at its separation circle suggests that chirality makes the tetrahedral layout more
-uniform at the price of longer, more curved seams, while the truncated icosahedron remains far more uniform.
+uniform at the price of longer, more curved seams, while the layouts with many panels, the truncated icosahedron and especially the Goldberg ball, remain far more uniform.
 \end{abstract}
 
 %-------------------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ we do not know the manufacturer's actual seam curves, and we do not model any fl
  panels with exactly shared seams, with closed-form seam geometry at the fixed points (\cref{thm:partition}, \cref{prop:tilt},
  \cref{prop:vertex}, \cref{prop:chiral}). The same recipe chiralises any rotation group (\cref{rem:families}).
 \item \textbf{Symmetry-restricted multipoles (\cref{sec:multipoles}).} Group theory fixes which multipoles of the
- seam network can be nonzero; we verify it numerically for twelve layouts.
+ seam network can be nonzero; we verify it numerically for fourteen layouts.
 \item \textbf{A comparison (\cref{sec:numerics}).} Panel counts, seam length, curvature and a geometric exposure proxy,
  with a sensitivity analysis showing which conclusions are robust and which are not.
 \end{enumerate}
@@ -321,21 +321,21 @@ this choice $G$ is constant up to degree $3$ for $T$ and $O$ \,(first variation 
 
 %-------------------------------------------------------------------------------------------------------------
 \section{Numerical comparison}\label{sec:numerics}
-We compare twelve layouts: the straight tetrahedron, the cube, octahedron, dodecahedron and icosahedron and their chiral versions ($\famTilt^\circ$ edge tilt), the
-Trionda model ($\tau=\tauDefault$ and $\famTilt^\circ$), and the truncated icosahedron. All quantities are on the unit sphere. Symmetry groups are computed
+We compare fourteen layouts: the straight tetrahedron, the cube, octahedron, dodecahedron and icosahedron and their chiral versions ($\famTilt^\circ$ edge tilt), the
+Trionda model ($\tau=\tauDefault$ and $\famTilt^\circ$), the truncated icosahedron, and a Goldberg 42-panel ball (12 pentagons and 30 hexagons, centred on the vertices and edge midpoints of the icosahedron, with the pentagon plane height tuned so that all 42 panels have equal area) with its chiral version, obtained from the same icosahedral flow as the chiral icosahedron. All quantities are on the unit sphere. Symmetry groups are computed
 numerically by testing which isometries map the panel partition to itself; seam length is computed exactly along the seam curves; $Q_\ell$ by quadrature on the seam curves; the exposure
 coefficient of variation (CV) of $G$ over $3000$ near-uniform axes with $\theta_s=90^\circ$, $\sigma=10^\circ$.
 
 \begin{table}[t]\centering\footnotesize
 \input{tables/family.tex}
-\caption{Twelve layouts. ``Symmetry'' lists the group and the number of rotations (plus improper isometries if achiral). $\ell^*$: lowest $\ell\ge1$ with $Q_\ell>10^{-9}$.
+\caption{Fourteen layouts. ``Symmetry'' lists the group and the number of rotations (plus improper isometries if achiral). $\ell^*$: lowest $\ell\ge1$ with $Q_\ell>10^{-9}$.
 Length/area is seam length divided by $4\pi$. Mean $|\kappa_g|$ is the arclength-weighted mean geodesic curvature of the seams.}\label{tab:family}
 \end{table}
 
 \paragraph{Symmetry and multipoles.}
 In every row, the detected rotation count equals the order of the intended group ($12$, $24$ or $60$), the chiral variants have no improper symmetry, and the straight ones have as many
 improper as proper symmetries. This confirms \cref{thm:partition}(iii) and \cref{prop:chiral} and also validates the code. The numerically computed multipoles satisfy
-\cref{thm:selection} exactly: $Q_\ell<10^{-9}$ whenever $\dim H_\ell^G=0$, and in all twelve cases $\ell^*$ equals the first degree with $\dim H^G_\ell>0$ (\cref{fig:multi}). The classic ball and the Trionda model are separated by $\ell^*=6$ versus $3$.
+\cref{thm:selection} exactly: $Q_\ell<10^{-9}$ whenever $\dim H_\ell^G=0$, and in all fourteen cases $\ell^*$ equals the first degree with $\dim H^G_\ell>0$ (\cref{fig:multi}). The classic ball and the Trionda model are separated by $\ell^*=6$ versus $3$.
 
 \begin{figure}[t]
 \centering\includegraphics[width=0.82\textwidth]{fig6_multipoles}
@@ -355,10 +355,10 @@ The straight tetrahedron needs the least seam per unit area of any layout in \cr
 \end{figure}
 
 \paragraph{Exposure proxy.}
-\Cref{fig:expo} shows $G(n)/\bar G$ for four layouts, and the last columns of \cref{tab:family} give the CV. Three observations hold in every comparison we made:
-(i) chirality lowers the CV in all five families ($T$, $O$, $I$ pairs of \cref{tab:family}), though only slightly at the matched $\famTilt^\circ$ tilt (for the tetrahedron $\expTetra\to\expTrionTwenty$);
+\Cref{fig:expo} shows $G(n)/\bar G$ for four layouts, and the last columns of \cref{tab:family} give the CV. At the default proxy parameters three observations hold:
+(i) chirality lowers the CV in all six straight/chiral pairs of \cref{tab:family}, though only slightly at the matched $\famTilt^\circ$ tilt (for the tetrahedron $\expTetra\to\expTrionTwenty$);
 (ii) for the tetrahedron the CV falls steadily with $\tau$, from $\expTetra$ to $\expTrionda$ at $\tau=\tauDefault$ and $\expTauTwo$ at $\tau=2$ (\cref{fig:tau}c);
-(iii) the truncated icosahedron has the lowest CV of all layouts ($\expClassic$, about $\expRatioClassic$ times lower than the Trionda model at $\tau=\tauDefault$).
+(iii) the layouts with the most panels have the lowest CV: the Goldberg ball ($\expGoldberg$, chiral $\expGoldbergChiral$) is lowest, the truncated icosahedron next ($\expClassic$, about $\expRatioClassic$ times lower than the Trionda model at $\tau=\tauDefault$); within the $I_h$ layouts of \cref{tab:family} the CV decreases with the panel count ($12$, $20$, $32$, $42$ panels). Four values do not make a trend, and we draw no further conclusion.
 
 \begin{figure}[t]
 \centering\includegraphics[width=\textwidth]{fig7_exposure_maps}
