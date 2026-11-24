@@ -1,6 +1,8 @@
 {
  "chirality_lowers_cv_all_families": true,
- "classic_lowest_cv": true,
+ "goldberg_lowest_cv": true,
+ "classic_second_lowest_cv": true,
+ "cv_decreases_with_panels_in_Ih": true,
  "trionda_below_tetra_all_sensitivity": true,
  "tau2_below_trionda_all_sensitivity": true,
  "classic_below_trionda_all_sensitivity": true,
