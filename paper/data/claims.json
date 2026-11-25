@@ -15,5 +15,22 @@
  "spectre_no_pentagon_pair_in_survey": true,
  "spectre_no_flat_hexagon_of_any_shape_in_survey": true,
  "spectre_some_closed_balls_at_19_to_21_tiles": true,
- "spectre_assembly_ledgers": true
+ "spectre_assembly_ledgers": true,
+ "hat_design_counts": true,
+ "hat_ledger_flat_except_holes": true,
+ "hat_ledger_720": true,
+ "T_acts_freely_on_hats_and_pentagons": true,
+ "I_acts_freely_on_hats": true,
+ "hat_trionda_15_hats_3_pentagons": true,
+ "hat_trionda_no_ties": true,
+ "selection_rule_trionda_3_hat_6": true,
+ "hat_cv_lowest_of_table": true,
+ "flow_blend_switches_on_l3": true,
+ "flow_blend_lengthens_seams": true,
+ "flow_blend_cv_below_trionda": true,
+ "freq_f3_I_exactly_two": true,
+ "freq_f5_f7_f9_none_exhausted": true,
+ "freq_f5_f7_both_hands_exhausted": true,
+ "freq_f9_both_hands_not_exhausted": true,
+ "hat_count_formula": true
 }
