@@ -77,6 +77,34 @@ if sp:
     claims["spectre_some_closed_balls_at_19_to_21_tiles"] = any(cl[str(n)]["closed"] > 0 for n in (19, 20, 21))
     claims["spectre_assembly_ledgers"] = (sp["joins"]["pair_ledger"] == 720 and sp["joins"]["chain3_ledger"] == 720
                                           and sp["joins"]["ring3_ledger"] == 0)
+# ---- Trionda / Hat Trick sections (data/hat_trick.json from make_hat_data.py)
+HTF = os.path.join(HERE, "data", "hat_trick.json")
+ht = json.load(open(HTF)) if os.path.exists(HTF) else None
+if ht:
+    dz, tt, ic, hb, fl, cmp_ = ht["design"], ht["tetra_subgroup"], ht["icosa_group"], ht["hat_trionda"], ht["flow"], ht["table"]
+    kt = dz["kite_angle_totals"]
+    claims["hat_design_counts"] = (dz["kites"] == 480 and dz["hats"] == 60 and dz["pentagons"] == 12 and dz["kites_per_hat"] == [8]
+                                   and dz["rotations"] == 60 and dz["symmetric_tilings"] == 2)
+    claims["hat_ledger_flat_except_holes"] = (set(kt) == {"v:360", "m:360", "c:360", "c:240", "m:180"}
+                                              and kt["c:240"] == 60 and kt["m:180"] == 60)
+    claims["hat_ledger_720"] = 12 * (360 + 180 * 10 - (5 * 240 + 5 * 180)) == 720
+    claims["T_acts_freely_on_hats_and_pentagons"] = (tt["order"] == 12 and tt["hat_orbit_sizes"] == [12] * 5
+                                                     and tt["pentagon_orbit_sizes"] == [12]
+                                                     and tt["max_hat_stabiliser"] == 1 and tt["max_pentagon_stabiliser"] == 1)
+    claims["I_acts_freely_on_hats"] = ic["hat_orbit_sizes"] == [60] and ic["max_hat_stabiliser"] == 1
+    claims["hat_trionda_15_hats_3_pentagons"] = hb["hats_per_panel"] == [15] * 4 and hb["pentagons_per_panel"] == [3] * 4
+    claims["hat_trionda_no_ties"] = hb["min_majority_fraction"] > 0.5
+    claims["selection_rule_trionda_3_hat_6"] = cmp_["trionda"]["lowest_multipole"] == 3 and cmp_["hat-trick-v0"]["lowest_multipole"] == 6
+    claims["hat_cv_lowest_of_table"] = all(cmp_["hat-trick-v0"]["exposure_cv"] < cmp_[k]["exposure_cv"] for k in cmp_ if not k.startswith("hat-trick"))
+    claims["flow_blend_switches_on_l3"] = all(r["lowest"] == 3 for r in fl if r["tau"] != 0) and next(r for r in fl if r["tau"] == 0)["lowest"] == 6
+    claims["flow_blend_lengthens_seams"] = all(r["seam_length"] > next(q for q in fl if q["tau"] == 0)["seam_length"] for r in fl if r["tau"] != 0)
+    claims["flow_blend_cv_below_trionda"] = all(r["exposure_cv"] < cmp_["trionda"]["exposure_cv"] for r in fl)
+    fs = {r["f"]: r for r in ht["frequency_scan"]}
+    claims["freq_f3_I_exactly_two"] = fs[3]["I"]["tilings"] == 2 and fs[3]["I"]["exhausted"]
+    claims["freq_f5_f7_f9_none_exhausted"] = all(fs[f][g]["tilings"] == 0 and fs[f][g]["exhausted"] for f in (5, 7, 9) for g in ("I", "T", "C5", "C1"))
+    claims["freq_f5_f7_both_hands_exhausted"] = all(fs[f]["C1_both_hands"]["tilings"] == 0 and fs[f]["C1_both_hands"]["exhausted"] for f in (5, 7))
+    claims["freq_f9_both_hands_not_exhausted"] = not fs[9]["C1_both_hands"]["exhausted"]
+    claims["hat_count_formula"] = all(abs(r["hats"] - 7.5 * (r["f"] ** 2 - 1)) < 1e-9 for r in fs.values())
 print(json.dumps(claims, indent=1))
 json.dump(claims, open(os.path.join(HERE, "data", "claims.json"), "w"), indent=1)
 
@@ -171,5 +199,71 @@ if sp:
     open(os.path.join(HERE, "tables", "spectre_closure.tex"), "w").write(
         "\\begin{tabular}{@{}rrrr@{}}\n\\toprule\ntiles $N$ & patches & close up & \\% \\\\\n\\midrule\n"
         + "\n".join(rows_) + "\n\\bottomrule\n\\end{tabular}\n")
+def sci(x, d=1):
+    if x == 0:
+        return "0"
+    mant, ex = f"{x:.{d}e}".split("e")
+    return f"{mant}\\times10^{{{int(ex)}}}"
+
+
+if ht:
+    LAB = {"trionda": (r"\textbf{Trionda model} ($\tau=0.9$)", "$T$"), "tetra-4": ("tetra-4", "$T_d$"),
+           "hat-trick-v0": (r"\textbf{Hat Trick}, tiling 0", "$I$"), "hat-trick-v1": ("Hat Trick, tiling 1", "$I$"),
+           "icosa-20": ("icosa-20", "$I_h$"), "classic-32": ("classic-32", "$I_h$"), "goldberg-42": ("goldberg-42", "$I_h$")}
+    rows = []
+    for k in ["trionda", "tetra-4", "hat-trick-v0", "hat-trick-v1", "icosa-20", "classic-32", "goldberg-42"]:
+        r = cmp_[k]
+        rows.append(f"{LAB[k][0]} & {r['panels']} & {LAB[k][1]} & {r['seam_length']:.2f} & {r['lowest_multipole']} & "
+                    f"{r['exposure_cv']:.4f} & {r['mean_abs_geodesic_curvature']:.2f} \\\\")
+    open(os.path.join(HERE, "tables", "compare.tex"), "w").write(
+        "\\begin{tabular}{@{}lrlrrrr@{}}\n\\toprule\nlayout & panels & group & seam length & $\\ell^*$ & exposure CV & mean $|\\kappa_g|$ \\\\\n\\midrule\n"
+        + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
+    frows = [f"${r['tau']:+.1f}$".replace("+0.0", "0.0") + f" & {r['seam_length']:.2f} & {r['exposure_cv']:.4f} & {r['lowest']} & ${sci(r['Q3'])}$ & ${sci(r['Q4'])}$ \\\\" for r in fl]
+    open(os.path.join(HERE, "tables", "flow.tex"), "w").write(
+        "\\begin{tabular}{@{}rrrrrr@{}}\n\\toprule\n$\\tau$ & seam length & exposure CV & $\\ell^*$ & $Q_3$ & $Q_4$ \\\\\n\\midrule\n"
+        + "\n".join(frows) + "\n\\bottomrule\n\\end{tabular}\n")
+    def cell(r):
+        if r["exhausted"]:
+            return f"{r['tilings']}"
+        return f"$\\ge{r['tilings']}$" if r["tilings"] else "$0^{*}$"
+    qrows = [f"{r['f']} & {r['tiles']} & {int(r['hats'])} & " + " & ".join(cell(r[g]) for g in ("I", "T", "C5", "C1", "C1_both_hands")) + " \\\\"
+             for r in ht["frequency_scan"]]
+    open(os.path.join(HERE, "tables", "hat_freq.tex"), "w").write(
+        "\\begin{tabular}{@{}rrrrrrrr@{}}\n\\toprule\n$f$ & tiles & hats & $I$ & $T$ & $C_5$ & $C_1$ & $C_1$, both hands \\\\\n\\midrule\n"
+        + "\n".join(qrows) + "\n\\bottomrule\n\\end{tabular}\n")
+    ch = ht["chirality_deg"]
+    htr = ht["hat_trionda"]
+    rl = dz["relax"]
+    fl0 = next(r for r in fl if r["tau"] == 0)
+    fl9 = next(r for r in fl if abs(r["tau"] - 0.9) < 1e-9)
+    hrow = ht["table"]["hat-trick-v0"]
+    m.update({
+        "htTiles": str(dz["tiles"]), "htTriangles": str(dz["triangles"]), "htKites": str(dz["kites"]), "htHats": str(dz["hats"]),
+        "htPlacements": str(dz["placements"]), "htTilings": {2: "two"}.get(dz["symmetric_tilings"], str(dz["symmetric_tilings"])),
+        "htRotations": str(dz["rotations"]), "htRms": f"{100 * rl['rms_strain']:.1f}", "htMaxStrain": f"{100 * rl['max_strain']:.1f}",
+        "htNConstraints": str(int(rl["n_constraints"])),
+        "htAreaRatio": f"{dz['report']['hat_to_pentagon_area']:.2f}", "htAreaSpread": f"{dz['report']['hat_area_spread']:.0e}".replace("e-0", "\\times10^{-").replace("e-", "\\times10^{-") + "}",
+        "htVerts": str(sum(kt.values())), "htFlatCorners": str(kt["v:360"] + kt["m:360"] + kt["c:360"]),
+        "htCentroidCorners": str(kt["c:240"]), "htMidCorners": str(kt["m:180"]),
+        "htPentOrbits": ",".join(str(x) for x in tt["pentagon_orbit_sizes"]), "htHatOrbits": ",".join(str(x) for x in tt["hat_orbit_sizes"]),
+        "htQSix": "$" + sci(hrow['Q'][6]) + "$",
+        "cmpTriSeam": f"{cmp_['trionda']['seam_length']:.2f}", "cmpHatSeam": f"{hrow['seam_length']:.2f}",
+        "cmpSeamRatio": f"{hrow['seam_length'] / cmp_['trionda']['seam_length']:.1f}",
+        "cmpTriLow": str(cmp_["trionda"]["lowest_multipole"]), "cmpHatLow": str(hrow["lowest_multipole"]),
+        "cmpTriCV": f"{cmp_['trionda']['exposure_cv']:.3f}", "cmpHatCV": f"{hrow['exposure_cv']:.4f}",
+        "cmpHatCVone": f"{ht['table']['hat-trick-v1']['exposure_cv']:.4f}",
+        "cmpGoldCV": f"{cmp_['goldberg-42']['exposure_cv']:.3f}", "cmpClassicCV": f"{cmp_['classic-32']['exposure_cv']:.3f}",
+        "cmpRatioCV": f"{cmp_['trionda']['exposure_cv'] / hrow['exposure_cv']:.0f}",
+        "cmpHatShape": f"{hrow['panel_shape_hat']:.2f}", "cmpPentShape": f"{hrow['panel_shape_pentagon']:.2f}",
+        "chTetra": f"{ch['tetra-4']:.1f}", "chTrioA": f"{ch['trionda tau=0.3']:.1f}", "chTrioB": f"{ch['trionda tau=0.6']:.1f}",
+        "chTrioC": f"{ch['trionda tau=0.9']:.1f}", "chHatA": f"{ch['hat-trick-v0']:.1f}", "chHatB": f"{ch['hat-trick-v1']:.1f}",
+        "chGoldChiral": f"{ch['goldberg-42-chiral']:.1f}",
+        "blHats": str(htr["hats_per_panel"][0]), "blPent": str(htr["pentagons_per_panel"][0]), "blSeam": f"{htr['super_seam_length']:.2f}",
+        "blMismatch": f"{100 * htr['area_mismatch_fraction']:.1f}", "blStraddle": str(htr["straddling_hats"]),
+        "blMinMaj": f"{100 * htr['min_majority_fraction']:.1f}",
+        "flSeamZero": f"{fl0['seam_length']:.1f}", "flSeamEnd": f"{fl9['seam_length']:.1f}",
+        "flCVZero": f"{fl0['exposure_cv']:.3f}", "flCVEnd": f"{fl9['exposure_cv']:.3f}",
+        "flRatio": f"{cmp_['trionda']['exposure_cv'] / fl9['exposure_cv']:.1f}",
+    })
 open(os.path.join(HERE, "tables", "numbers.tex"), "w").write("".join(f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in m.items()))
 print(m)
