@@ -110,3 +110,52 @@ def test_signature_is_rotation_invariant(p3):
     h = r.holes[0]
     rot = Hole(h.edges[1:] + h.edges[:1], h.corners[1:] + h.corners[:1], h.vertices[1:] + h.vertices[:1])
     assert signature(r, h) == signature(r, rot)
+
+
+# ---- joining spheres ------------------------------------------------------------------------------
+def _two_hole_folds(k=3):
+    import random
+    from spectre.patch import SpectrePatch
+    from spectre.search import PatchPool
+    from spectre.dp import fold_with_holes
+    pool = PatchPool(SpectrePatch(levels=3))
+    rng = random.Random(2)
+    out = []
+    for _ in range(400):
+        g = pool.graph(pool.random_subset(rng.randint(8, 12), rng, 0.3))
+        if g is None:
+            continue
+        r = fold_with_holes(g, [[240, 270, 240, 270]] * 2)
+        if r:
+            out.append(r)
+        if len(out) == k:
+            break
+    return out
+
+
+def test_join_ledger_and_saddles():
+    from spectre.connect import join_spheres
+    a, b, *_ = _two_hole_folds()
+    js = join_spheres(a, 0, b, 0)
+    assert js.ledger == 720
+    assert len(js.open_holes) == 2 and all(K == 60 for _, _, K in js.open_holes)
+    assert all(d < 0 for d in js.junction_deficits)       # 240/270 + 240/270 > 360: saddle neck
+
+
+def test_join_requires_equal_sides(p3):
+    from spectre.connect import join_spheres
+    from spectre.dp import fold_with_holes
+    a = fold_with_holes(_graph(p3, 1), [[240, 270, 240, 270]])
+    b = fold_with_holes(_graph(p3, 1), [[120, 240, 240, 270, 270, 270]])
+    if b is not None:
+        with pytest.raises(ValueError):
+            join_spheres(a, 0, b, 0)
+
+
+def test_embed_joined_seam_is_closed():
+    from spectre.connect import join_spheres
+    from spectre.embed import embed_joined
+    a, b, *_ = _two_hole_folds()
+    je = embed_joined(join_spheres(a, 0, b, 0))
+    assert len(set(je.rim.tolist())) == 4                  # the 4 seam vertices are single points
+    assert np.isfinite(je.position).all() and je.rms_strain < 0.1
