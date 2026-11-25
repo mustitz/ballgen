@@ -8,5 +8,12 @@
  "classic_below_trionda_all_sensitivity": true,
  "cube_vs_tetra_order_flips": true,
  "cv_monotone_decreasing_in_tau_beyond_0.3": true,
- "seam_length_monotone_in_tau": true
+ "seam_length_monotone_in_tau": true,
+ "spectre_dp_matches_brute_force": true,
+ "spectre_closure_rate_falls_with_size": true,
+ "spectre_no_regular_hexagon_hole_in_survey": true,
+ "spectre_no_pentagon_pair_in_survey": true,
+ "spectre_no_flat_hexagon_of_any_shape_in_survey": true,
+ "spectre_some_closed_balls_at_19_to_21_tiles": true,
+ "spectre_assembly_ledgers": true
 }
