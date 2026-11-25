@@ -8,7 +8,7 @@ angles add up to at most 360 degrees (equal to 360 means the joined vertex is fl
 """
 from __future__ import annotations
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 from .fold import FoldResult, Hole, N_E
 
@@ -132,18 +132,39 @@ class JoinedSurface:
         return "\n".join(lines)
 
 
+def join_many(parts: Sequence[FoldResult], joins: Sequence[Tuple[int, int, int, int]],
+              match_kinds: bool = False) -> JoinedSurface:
+    """Sew several folds together.  ``joins`` lists (part a, hole a, part b, hole b); every hole may be used once.
+
+    The result is a closed-up surface whose total curvature is 720 * (parts - joins) degrees (= 360 * Euler
+    characteristic for a connected assembly): 720 for a tree of spheres, 0 for a ring (a torus).  That identity
+    is asserted."""
+    parts = list(parts)
+    used = set()
+    js = JoinedSurface(parts, [], [], [], [])
+    for (pa, ha, pb, hb) in joins:
+        for key in ((pa, ha), (pb, hb)):
+            if key in used:
+                raise ValueError(f"hole {key} is used twice")
+            used.add(key)
+        out = best_join(parts[pa], parts[pa].holes[ha], parts[pb], parts[pb].holes[hb], match_kinds)
+        if out is None:
+            raise ValueError("holes cannot be joined")
+        r, ang, agree = out
+        js.joins.append((pa, ha, pb, hb))
+        js.rotation.append(r)
+        js.junction_angles.append(ang)
+        js.kinds_agree.append(agree)
+    for pi, res in enumerate(parts):
+        for hi, h in enumerate(res.holes):
+            if (pi, hi) not in used:
+                js.open_holes.append((pi, hi, h.K))
+    expect = 720 * (len(parts) - len(joins))
+    if js.ledger != expect:
+        raise AssertionError(f"joined ledger {js.ledger} != {expect}")
+    return js
+
+
 def join_spheres(res1: FoldResult, h1: int, res2: FoldResult, h2: int, match_kinds: bool = False) -> JoinedSurface:
     """Join hole ``h1`` of ``res1`` to hole ``h2`` of ``res2``."""
-    out = best_join(res1, res1.holes[h1], res2, res2.holes[h2], match_kinds)
-    if out is None:
-        raise ValueError("holes cannot be joined")
-    r, ang, agree = out
-    js = JoinedSurface([res1, res2], [(0, h1, 1, h2)], [r], [ang], [agree])
-    for pi, res in enumerate(js.parts):
-        for hi, h in enumerate(res.holes):
-            if (pi, hi) in ((0, h1), (1, h2)):
-                continue
-            js.open_holes.append((pi, hi, h.K))
-    if js.ledger != 720:
-        raise AssertionError(f"joined ledger {js.ledger} != 720")
-    return js
+    return join_many([res1, res2], [(0, h1, 1, h2)], match_kinds)
