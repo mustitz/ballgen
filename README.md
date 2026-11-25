@@ -125,3 +125,57 @@ Edge lines follow great circles (shortest paths on sphere) using:
 - Haversine formula for distance calculation
 - Configurable point density for quality vs. performance
 
+
+## Folding the Spectre monotile (`spectre/`, `fold_spectre.py`)
+
+Tile code is copied from brentharts/spectre-monotile-py (`spectre/tile.py`, `spectre/patch.py`).
+`python fold_spectre.py -n 9 -n 25` folds a patch of N tiles by gluing boundary edges of the patch
+(zips), keeping an exact integer angle ledger (all Spectre corners are multiples of 30 deg):
+cone points have deficit 360 - angle, leftover boundary loops are holes with curvature
+K = 360 + 180n - sum(tile angles at its corners). Discrete Gauss-Bonnet: sum(cone deficits) + sum(hole K) = 720
+(asserted on every fold). Each hole records its boundary loop, side count and kind, K, and an
+approximate spherical area / centre from a 3D relaxation (`spectre/embed.py`, ~2% rms edge strain).
+The gluing is a heuristic beam search, not a proof of optimality; local zipping yields one hole per fold.
+
+### Multi-hole folding (exact)
+
+`spectre/dp.py` replaces the heuristic search with an exact interval DP over *all* non-crossing gluings of
+a patch boundary (corner angles are multiples of 30 deg, so the state space is tiny).  `fold_with_holes(graph,
+[theta1, theta2, ...])` returns a fold with holes whose corner angles (tile angle at each hole corner) are
+exactly the given lists, or `None` when the boundary admits none; `[]` asks for a closed ball.  Each hole sits
+inside its own glued pair, and the ledger (cone deficits + hole K = 720) is asserted on replay.
+
+    python fold_spectre.py --hole square-alt --hole square-alt --nmin 8 --nmax 12   # two K=60 holes
+    python fold_spectre.py --hole none --nmin 6 --nmax 10                           # closed balls
+
+`spectre/search.py` draws random connected tile subsets (the tile set is the real lever); `spectre/connect.py`
+gives hole signatures (corner angles + a/b edge kinds, up to rotation/reflection) and `join_vertices` to test
+whether two holes can be glued edge to edge.  `spectre/holes_io.py` loads `holes.json`.
+### Closed balls: patches that fold shut with no hole
+
+The same DP answers whether the *whole* boundary can be glued shut (`can_close`, `fold_with_holes(graph, [])`).
+Small random patches often can (89% of 4-tile, 45% of 6-tile, 20% of 8-tile patches), the rate falls to about 1% beyond
+12 tiles, but closings still exist at 19-21 tiles.  Every closed ball has cone points whose angle deficits add to
+exactly 720 deg (Gauss-Bonnet); most vertices are flat (deficit 0).
+
+![closed balls](spectre/figures/closed_balls.png)
+
+![closure rate](spectre/figures/closure_rate.png)
+
+(150 random connected patches per size, drawn from the level-3 Spectre patch; 3D shapes are relaxed estimates.)
+
+### Two spheres connected through their holes
+
+`spectre.connect.join_spheres(a, i, b, j)` sews hole `i` of fold `a` to hole `j` of fold `b`: the boundaries run in
+opposite directions, edge kinds are matched when possible, and at every joined vertex the two tile angles add up.
+A sum below 360 leaves a cone point, a sum above 360 a saddle (negative curvature, a neck).  The ledger of the joined
+surface (cone deficits + junction deficits + curvature of the remaining open holes) is asserted to be 720 deg.
+The pictured pair joins two 4-gon holes (tile angles 240/270 deg on both sides), so the neck is a saddle with
+deficits -120/-180 deg; each sphere keeps one open K=60 hole for the next connection.
+
+![joined spheres](spectre/figures/joined_spheres.png)
+
+    python make_spectre_figures.py          # regenerates the three figures above (survey cached in spectre/figures/survey.json)
+
+Results so far: K=60 square holes appear in pairs on 8-12 tiles; no K=0 hexagon and no pentagon pair was found in any
+single-tile, grown-patch or ~5000 random-patch test (the DP is exact, so for those patches there is none).
