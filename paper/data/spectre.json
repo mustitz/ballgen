@@ -1,0 +1,177 @@
+{
+ "validate": {
+  "one_tile_k4": {
+   "boundary_edges": 14,
+   "brute": 11,
+   "dp": 11,
+   "equal": true
+  },
+  "one_tile_k6": {
+   "boundary_edges": 14,
+   "brute": 19,
+   "dp_missing": 0
+  },
+  "two_tiles_k4": {
+   "boundary_edges": 22,
+   "brute": 7,
+   "dp_missing": 0
+  },
+  "all_agree": true
+ },
+ "survey": {
+  "counts": {
+   "discs": 759,
+   "closed": 63,
+   "square": 92,
+   "square_pair": 77,
+   "hexagon_regular": 0,
+   "pentagon_pair": 0,
+   "flat_hexagon_any": 0,
+   "flat_draws": 199
+  },
+  "draws": 800,
+  "seed": 5,
+  "n_range": [
+   6,
+   24
+  ],
+  "n_flat_hexagon_patterns": 30,
+  "flat_n_range": [
+   6,
+   16
+  ]
+ },
+ "closure": {
+  "per_n": 150,
+  "seed": 5,
+  "rows": {
+   "4": {
+    "discs": 150,
+    "closed": 133
+   },
+   "5": {
+    "discs": 150,
+    "closed": 100
+   },
+   "6": {
+    "discs": 150,
+    "closed": 68
+   },
+   "7": {
+    "discs": 150,
+    "closed": 40
+   },
+   "8": {
+    "discs": 148,
+    "closed": 29
+   },
+   "9": {
+    "discs": 149,
+    "closed": 30
+   },
+   "10": {
+    "discs": 149,
+    "closed": 14
+   },
+   "11": {
+    "discs": 148,
+    "closed": 10
+   },
+   "12": {
+    "discs": 148,
+    "closed": 8
+   },
+   "13": {
+    "discs": 146,
+    "closed": 1
+   },
+   "14": {
+    "discs": 143,
+    "closed": 1
+   },
+   "15": {
+    "discs": 146,
+    "closed": 1
+   },
+   "16": {
+    "discs": 141,
+    "closed": 0
+   },
+   "17": {
+    "discs": 145,
+    "closed": 1
+   },
+   "18": {
+    "discs": 144,
+    "closed": 1
+   },
+   "19": {
+    "discs": 146,
+    "closed": 0
+   },
+   "20": {
+    "discs": 137,
+    "closed": 1
+   },
+   "21": {
+    "discs": 138,
+    "closed": 1
+   },
+   "22": {
+    "discs": 134,
+    "closed": 0
+   },
+   "23": {
+    "discs": 129,
+    "closed": 0
+   },
+   "24": {
+    "discs": 138,
+    "closed": 1
+   }
+  }
+ },
+ "joins": {
+  "pair_tiles": [
+   8,
+   11
+  ],
+  "pair_ledger": 720,
+  "pair_junction_deficits": [
+   -180,
+   -120
+  ],
+  "pair_open_K": [
+   60,
+   60
+  ],
+  "pair_cones": [
+   5,
+   6
+  ],
+  "ring3_ledger": 0,
+  "chain3_ledger": 720
+ },
+ "hub3": {
+  "k": 3,
+  "discs": 582,
+  "found": 2,
+  "seed": 3,
+  "first": {
+   "tiles": 10,
+   "K": [
+    60,
+    60,
+    60
+   ],
+   "ledger": 720
+  }
+ },
+ "hub4": {
+  "k": 4,
+  "discs": 577,
+  "found": 0,
+  "seed": 4,
+  "first": null
+ }
+}
