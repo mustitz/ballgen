@@ -159,3 +159,30 @@ def test_embed_joined_seam_is_closed():
     je = embed_joined(join_spheres(a, 0, b, 0))
     assert len(set(je.rim.tolist())) == 4                  # the 4 seam vertices are single points
     assert np.isfinite(je.position).all() and je.rms_strain < 0.1
+
+
+# ---- chains, rings, assemblies --------------------------------------------------------------------
+def test_join_many_chain_and_ring_ledger():
+    from spectre.connect import join_many
+    fs = _two_hole_folds(4)
+    chain = join_many(fs[:3], [(0, 1, 1, 0), (1, 1, 2, 0)])
+    assert chain.ledger == 720 and len(chain.open_holes) == 2
+    ring = join_many(fs[:3], [(0, 1, 1, 0), (1, 1, 2, 0), (2, 1, 0, 0)])
+    assert ring.ledger == 0 and ring.open_holes == []
+
+
+def test_join_many_rejects_reused_hole():
+    from spectre.connect import join_many
+    fs = _two_hole_folds(3)
+    with pytest.raises(ValueError):
+        join_many(fs[:3], [(0, 1, 1, 0), (0, 1, 2, 0)])
+
+
+def test_embed_assembly_chain():
+    from spectre.connect import join_many
+    from spectre.embed import embed_assembly
+    fs = _two_hole_folds(3)
+    ae = embed_assembly(join_many(fs[:3], [(0, 1, 1, 0), (1, 1, 2, 0)]), sphere_weight=0.3)
+    assert len(ae.rims) == 2 and all(len(set(r.tolist())) == 4 for r in ae.rims)
+    assert np.isfinite(ae.position).all() and ae.rms_strain < 0.1
+    assert len(ae.tile_polys) == sum(r.graph.n_tiles for r in fs[:3])
