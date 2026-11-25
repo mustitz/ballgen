@@ -60,6 +60,7 @@ $\ell=3$ for tetrahedral, $4$ for octahedral and $6$ for icosahedral layouts, an
 with the symmetry-group orders ($12$ versus $60$), for fourteen layouts including a truncated icosahedron and a 42-panel Goldberg ball. A purely
 geometric proxy for the seam a flow meets at its separation circle suggests that chirality makes the tetrahedral layout more
 uniform at the price of longer, more curved seams, while the layouts with many panels, the truncated icosahedron and especially the Goldberg ball, remain far more uniform.
+A final section is a side study of a different chiral object, the Spectre aperiodic monotile: we prove an angle ledger for folding tile patches into spheres with holes, search the gluings exactly by an interval dynamic programme validated against brute force, and report which random patches close into balls (\spSurveyClosed\ of \spSurveyDiscs\ sampled patches) and what happens when spheres are joined through their holes.
 \end{abstract}
 
 %-------------------------------------------------------------------------------------------------------------
@@ -394,6 +395,93 @@ cube versus tetrahedron.
 \end{table}
 
 %-------------------------------------------------------------------------------------------------------------
+%-------------------------------------------------------------------------------------------------------------
+\section{A second chiral family: folding patches of the Spectre monotile into spheres}\label{sec:spectre}
+The \emph{Spectre} \citep{smith_spectre} is a chiral aperiodic monotile: a single polygon with $14$ edges whose tilings of the plane are all
+non-periodic. This section asks a question that is independent of the ball model but
+close in spirit to the hexagonal grids of \cref{fig:chiralhex}: \emph{which patches of this tile can be folded shut into a closed ball, and what is left
+over when they cannot?} We use the straight-edged equilateral polygon (all $14$ edges of length $1$; the $a=b=1$ member of the family) and make no
+claim about any real ball. The code is in \texttt{spectre/} of the repository, and every number below is produced by \texttt{make\_spectre\_data.py}.
+
+\subsection{Folds, cones and holes}
+All corner angles of the tile are multiples of $30^\circ$: $(90,120,270,120,90,120,270,120,180,120,90,240,90,240)$ in degrees, summing to $2160^\circ$.
+Take a patch of $N$ tiles that is a topological disc, with boundary loop of $m$ unit edges. A \emph{fold} glues boundary edges in pairs, without crossing and
+without changing any edge length, so the result is a surface that is flat except at vertices. Tiles are allowed to crease: they stay intrinsically flat.
+At a vertex where several tile corners meet, the \emph{angle} is their sum $a$; if the vertex is closed (surrounded by tiles) its \emph{deficit} is $\delta=360^\circ-a$, which must be $\ge 0$ here.
+Boundary loops that are left unglued are \emph{holes}. A hole with $n$ unit edges and total tile angle $\theta_i$ at its $i$th corner has interior angles $\alpha_i=360^\circ-\theta_i$ and
+\emph{curvature}
+\begin{equation}K\;=\;\sum_i\alpha_i-(n-2)\,180^\circ\;=\;360^\circ+180^\circ\,n-\sum_i\theta_i,\label{eq:holeK}\end{equation}
+the amount of curvature a cap would have to carry; $K=0$ with a closing equilateral polygon (for example $n=6$, all $\alpha_i=120^\circ$) means the hole could be filled flat.
+
+\begin{proposition}[angle ledger]\label{prop:ledger}
+For a fold of a disc patch with $h$ holes (each a simple loop), $\sum_{\text{closed vertices}}\delta_v+\sum_{\text{holes}}K_j=720^\circ$.
+\end{proposition}
+\begin{proof}
+Let $c$ be the number of closed vertices, $g$ the number of glued pairs and $H=\sum_j n_j$ the number of hole edges. Counting tile edges, $14N=2g+H$; the surface has $V=c+H$ vertices, $E=g+H$ edges and $F=N$
+faces, and is a sphere with $h$ discs removed, so $V-E+F=2-h$, i.e.\ $c+N-g=2-h$. The tile angles add to $2160^\circ N$, and they are distributed over the closed vertices and the hole corners:
+$\sum_v a_v+\sum_{j,i}\theta_{j,i}=2160^\circ N$. Hence $\sum_v(360^\circ-a_v)+\sum_j K_j=360^\circ c+360^\circ h+180^\circ H-2160^\circ N=360^\circ(c+h+H/2-6N)=360^\circ(c+N-g+h)=720^\circ$, using $g=7N-H/2$.
+\end{proof}
+
+\begin{lemma}[parity]\label{lem:parity}
+The total number of hole edges is even. In particular a single hole cannot have an odd number of sides; pentagonal holes can occur only together with another odd hole.
+\end{lemma}
+\begin{proof}
+The boundary of the patch has $m=14N-2g_0$ edges, and every glued pair removes two of them.
+\end{proof}
+
+A fold of a patch into a \emph{closed} ball has $h=0$, so its deficits are all $\ge0$ and sum to $720^\circ$. By Alexandrov's gluing theorem \citep{alexandrov_polyhedra}, such a polyhedral metric on the sphere is the boundary of a unique convex polyhedron, possibly degenerate, so the intrinsic folds below are realisable in space, with the tiles bent along creases.
+The three-dimensional pictures in this section are \emph{not} that polyhedron: they come from a numerical relaxation (positions of the glued vertices with every tile-triangle edge kept at its length and a weak pull towards a sphere), whose residual edge strain is nonzero.
+
+\subsection{An exact search over gluings}
+Index the boundary edges cyclically $0,\dots,m-1$ and let $A_k$ be the total tile angle at the vertex between edges $k-1$ and $k$. Gluing edge $i$ to edge $j$ (reversed) identifies vertex $i+1$ with vertex $j$ and vertex $j+1$ with vertex $i$.
+\begin{lemma}[runs]\label{lem:runs}
+Let a run of edges $l,\dots,r$ be matched among themselves without crossings, with outermost pairs $(l_1,j_1),\dots,(l_s,j_s)$, where $l_1=l$, $l_{t+1}=j_t+1$ and $j_s=r$. Then vertices $l$ and $r+1$ become one vertex, whose share of the angle from the run is
+$S+A_{r+1}$ with $S=A_{l_1}+\dots+A_{l_s}$, and the pair $(l_t,j_t)$ closes a vertex of angle $S_t+A_{j_t}$, where $S_t$ is the corresponding sum for the run strictly inside the pair.
+A hole with reserved edges $r_1<\dots<r_k$ inside a glued pair $(l,j)$, with the gaps $G_0,\dots,G_k$ between them matched in runs, has corner angles
+$\theta_{r_t}=S(G_{t-1})+A_{r_t}$ for $t\ge2$ and $\theta_{r_1}=S(G_0)+S(G_k)+A_{r_1}+A_j$.
+\end{lemma}
+\noindent(Induction on the number of pairs; each glued pair merges the two vertex pairs named above.) All angles are multiples of $30^\circ$ and at most $360^\circ$, so the achievable sums $S$ of a run are a $13$-bit mask, and an interval dynamic programme over runs
+decides in $O(m^3)$ word operations whether a given gluing pattern exists (\texttt{spectre/dp.py}). For one hole the programme is run on the doubled loop, which covers every rotation and therefore \emph{every} non-crossing gluing. For several holes it covers the gluings in which each hole lies inside a glued pair and no hole is nested in another hole's region; a negative answer for two or more holes is a statement about that class only.
+
+\emph{Validation.} For one tile ($m=14$) an exhaustive enumeration of all layouts of four reserved edges and all zip orders gives \spBruteOne\ reachable corner multisets, exactly those found by the programme; for six reserved edges the enumeration gives \spBruteSix, and for two tiles ($m=22$) and four reserved edges \spBruteTwo, and the programme finds all of them. Every fold the programme returns is replayed through an independent bookkeeping of vertices and angles, and \cref{prop:ledger} is asserted on it.
+
+\subsection{What the search finds}
+\paragraph{Closed balls.}
+\Cref{tab:spclosure} gives, for random connected patches of $N$ tiles (up to \spPerN\ draws per size, from a Spectre patch), the fraction whose whole boundary can be glued shut. Small patches usually can; the fraction falls quickly
+with $N$, from about $89\%$ at $4$ tiles to $5\%$ at $12$ and under $1\%$ at $20$ and $24$, but closed balls still exist at $19$--$21$ tiles (\cref{fig:spclosed}).
+\begin{table}[t]\centering\footnotesize
+\input{tables/spectre_closure.tex}
+\caption{Random disc patches of $N$ tiles that fold into a closed ball with no hole (exact search). \spPerN\ draws per size; draws that are not discs are discarded.}\label{tab:spclosure}
+\end{table}
+\begin{figure}[t]
+\centering\includegraphics[width=\textwidth]{closed_balls}
+\caption{Six patches (6, 8, 10, 12, 19 and 21 tiles) that fold into closed balls with no hole. Dots mark the cone points (area proportional to the deficit); their deficits add to $720^\circ$ (\cref{prop:ledger}). The shape is a numerical relaxation, not the Alexandrov polyhedron.}\label{fig:spclosed}
+\end{figure}
+
+\paragraph{Holes.}
+In a survey of \spSurveyDiscs\ random disc patches of $\spNMin$--$\spNMax$ tiles, \spSurveySquare\ admitted a fold with a single four-sided hole whose corners alternate $240^\circ,270^\circ$ ($K=60^\circ$) and \spSurveySquarePair\ a fold with two of them. The natural targets did \emph{not} occur:
+a regular hexagonal hole (all $\theta_i=240^\circ$, $K=0$) in \spSurveyHex\ of the \spSurveyDiscs\ patches, a pair of pentagonal holes ($K=60^\circ$ each) in \spSurveyPent, and, in a second survey of \spFlatDraws\ patches of $\spNMin$--$\spFlatNMax$ tiles, none of the \spFlatPatterns\ flat-fillable equilateral hexagons of any shape in \spFlatHex. For one hole these are exact statements about those patches (\cref{lem:runs}); they say nothing about patches that were not drawn, and \cref{lem:parity} rules out a lone pentagon in every patch. Folds with three square holes are rarer: \spHubThreeFound\ of \spHubThreeDiscs\ sampled disc patches, and \spHubFourFound\ of \spHubFourDiscs\ with four.
+
+\subsection{Joining folds through their holes}
+Two folds can be sewn together by gluing a hole of one to a hole of the other, with matching side counts and edge kinds and with the boundaries running in opposite directions. At the $i$th joined vertex the two tile angles add, $\theta_i+\theta'_i$, so the junction has deficit $360^\circ-\theta_i-\theta'_i$, which is \emph{negative} (a saddle, a neck) when the sum exceeds $360^\circ$.
+\begin{proposition}[assemblies]\label{prop:join}
+Sewing $p$ folds together along $q$ pairs of holes gives total curvature $720^\circ(p-q)$: $720^\circ$ for a tree of spheres, $0^\circ$ for a ring (a torus).
+\end{proposition}
+\begin{proof}
+By \cref{eq:holeK}, a join of holes with $n$ sides has $K+K'=720^\circ+\sum_i(360^\circ-\theta_i-\theta'_i)$, so removing the two holes and adding the junction deficits changes the ledger of \cref{prop:ledger} by exactly $-720^\circ$.
+\end{proof}
+The programme asserts \cref{prop:join} on every assembly. \Cref{fig:spjoin} shows two folds, each with two square holes ($K=60^\circ$), joined through one hole each: the junction deficits are $\spJunctionA^\circ$ and $\spJunctionB^\circ$, the ledger is \spPairLedger$^\circ$, and each sphere keeps an open hole for a further join.
+Chains give \spChainLedger$^\circ$ and a ring of three gives \spRingLedger$^\circ$. The relaxation that draws the assemblies is a weak approximation, and the closing seam of a ring comes out crumpled in three dimensions, so no ring is drawn.
+\begin{figure}[t]
+\centering\includegraphics[width=\textwidth]{joined_spheres}
+\caption{Two folded Spectre patches (warm and cool tiles) sewn together through a four-sided hole each (black seam), with the remaining holes (red) still open. Faces are shaded by their normals so that creases show. The shape is a relaxed approximation; the seam is a saddle.}\label{fig:spjoin}
+\end{figure}
+\begin{figure}[t]
+\centering\includegraphics[width=0.95\textwidth]{sphere_chain}
+\caption{A chain of three folded Spectre patches; black: seams, red: the two open ends. The ledger is \spChainLedger$^\circ$ (\cref{prop:join}).}\label{fig:spchain}
+\end{figure}
+
+
 \section{Discussion and limitations}
 \paragraph{What the model does and does not say.}
 The reported properties of the Trionda---four panels, tetrahedral origin, curved and meandering seams, $12$ rotational symmetries---are all realised by the model for any $\tau\ne0$, and the
@@ -411,9 +499,12 @@ the lower symmetry; this is a hypothesis, not something our computations show ab
 one for $T$ but not the only one, and different choices give different seam shapes with the same symmetry. (3) Family comparisons depend on how chirality is calibrated; we used equal edge tilt. (4) Sampling
 error: exposure CV is estimated from $3000$ axes, and $Q_\ell$ and seam lengths from quadrature on the seam curves, whose errors are far below the differences discussed.
 
+\paragraph{The Spectre study.}
+\Cref{sec:spectre} is independent of the ball model and has its own limits. The patches are random samples, so the absence of regular hexagonal holes and of pentagon pairs is a finding about the sample, not a theorem; the multi-hole search is exact only for gluings in which each hole lies inside a glued pair and no hole is nested in another's region; and the three-dimensional pictures are relaxed approximations, not the Alexandrov polyhedra, with tiles bent and some strain left. The straight-edged tile is used rather than a curved-edge one, and no connection to a real ball is claimed.
+
 \paragraph{Open questions.}
 Which $T$-equivariant four-panel partitions minimise seam length for a prescribed seam tilt? Can the true panel outline be matched by choosing $f$? How well does $G(n)$ correlate with wind-tunnel
-measurements, which \citet{hasson_sciam} reports are planned?
+measurements, which \citet{hasson_sciam} reports are planned? For the Spectre: does any patch fold into a regular flat hexagonal hole or a pair of pentagons once all gluings, including adjacent holes, are searched? Which closed balls are realised by genuinely convex polyhedra of low strain?
 
 \appendix
 
