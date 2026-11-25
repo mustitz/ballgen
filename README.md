@@ -192,5 +192,8 @@ in 3D (`python make_spectre_figures.py --only ring`), so no picture of it is sho
 
     python make_spectre_figures.py          # regenerates all figures above (survey cached in spectre/figures/survey.json)
 
-Results so far: K=60 square holes appear in pairs on 8-12 tiles; no K=0 hexagon and no pentagon pair was found in any
-single-tile, grown-patch or ~5000 random-patch test (the DP is exact, so for those patches there is none).
+Results (reproducible via `paper/make_spectre_data.py`, see `paper/data/spectre.json`): in a survey of 759 random disc patches
+of 6-24 tiles, 92 admit a single K=60 square hole and 77 a pair of them; no regular hexagonal hole (K=0), no pentagon pair
+and, in a second survey of 199 patches, no flat-fillable equilateral hexagon of any shape was found. The one-hole DP covers
+every gluing (it runs on the doubled loop and equals brute force on one- and two-tile cases); with several holes it covers only
+gluings where each hole lies inside a glued pair and no hole is nested in another, so the pentagon-pair result is for that class.
