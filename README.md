@@ -197,3 +197,39 @@ of 6-24 tiles, 92 admit a single K=60 square hole and 77 a pair of them; no regu
 and, in a second survey of 199 patches, no flat-fillable equilateral hexagon of any shape was found. The one-hole DP covers
 every gluing (it runs on the doubled loop and equals brute force on one- and two-tile cases); with several holes it covers only
 gluings where each hole lies inside a glued pair and no hole is nested in another, so the pentagon-pair result is for that class.
+
+
+## The Hat Trick ball (`the_hat_trick_ball.py`)
+
+A 72-panel ball: 60 "hat" tiles (the aperiodic monotile) and 12 regular-ish pentagons; a patch is a pentagon
+with 5 hats around it, and 12 patches close into a sphere.  Everything below is searched or computed, nothing is
+typed in; the design is a reconstruction from the description (no panel drawing was available), see the caveats.
+
+    python the_hat_trick_ball.py                 # build, report, write hat_trick_out/ (figures + JSON)
+    python the_hat_trick_ball.py --variant 1     # the second icosahedral tiling
+    python the_hat_trick_ball.py --mirror        # opposite hand
+
+How it works.  The hat is a polykite of 8 kites (the kite of the deltoidal trihexagonal tiling; edges 1 and sqrt3,
+one straight edge of length 2).  The Goldberg polyhedron GP(3,0) has 12 pentagons and 80 hexagons; cutting each
+hexagon into 6 kites gives 480 kites = 60 hats x 8.  The script builds the geodesic icosahedron (frequency 3),
+the kite complex, embeds the hat in every orientation-preserving way (360 placements) and keeps the placements whose
+60 rotated copies (the icosahedral rotation group) tile all 480 kites exactly.  That gives two tilings; in both,
+every pentagon is touched by exactly 5 hats and the 60 hats form a single orbit.  Because hats are chiral only the
+rotation group acts, and a hat has no symmetry, so 60 hats = one free orbit.
+
+The pentagon hole has 5 sides of length 2; hats contribute 240 deg at each pentagon corner (two hat corners of 120),
+i.e. a 120-degree pentagon with K = 60 deg, and 12 x 60 = 720 closes the Gauss-Bonnet ledger with no other
+curvature: the flat hats meet each other with no deficit anywhere.  The sphere is then found by moving every kite
+corner on the unit sphere so each kite stays as close as possible to its flat shape (sides 1 and sqrt3, diagonals 2
+and sqrt3) and straight lines stay straight.  Result (variant 0): rms strain 2.1 %, max 5.3 %, all 60 hats have equal
+area (spread < 1e-6), hat : pentagon area = 2.32, total area = 4 pi.
+
+![hat trick ball](examples/hat_trick_ball.png)
+
+![the hat](examples/hat_trick_hat.png)
+
+Caveats.  (1) I could not check the tiling against the real 12 Pentagons panel pattern; the two tilings here have the
+same 40-kite patch outline and differ only in how the five hats cut it up, so which one (and which hand) matches the
+real ball has to be compared by eye (`--variant`, `--mirror`).  (2) Panels are shown with geodesic edges on the unit
+sphere after the relaxation, so hats are slightly strained, not rigid flat polygons.  (3) The pattern is
+periodic under the icosahedral group, so it is a hat *demonstration* ball, not an aperiodic tiling of a sphere.
