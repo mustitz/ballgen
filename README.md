@@ -175,7 +175,22 @@ deficits -120/-180 deg; each sphere keeps one open K=60 hole for the next connec
 
 ![joined spheres](spectre/figures/joined_spheres.png)
 
-    python make_spectre_figures.py          # regenerates the three figures above (survey cached in spectre/figures/survey.json)
+`join_many(parts, joins)` sews any number of folds (each hole is used once).  The ledger of the assembly is
+asserted to be 720 deg x (parts - joins): 720 for a tree of spheres, 0 for a ring (a torus).  `embed_assembly`
+places each child sphere against its parent's hole (twist and mirror chosen so the two rims coincide), merges the
+seam vertices and relaxes the whole mesh with exact tile edge lengths plus a weak pull of every part towards its
+own sphere (`sphere_weight`: higher is rounder, lower is more faithful; at 0.4 the rms edge strain is ~3%).
+Faces are shaded by their normals so the creases show.
+
+![chain of four spheres](spectre/figures/sphere_chain.png)
+
+![hub with three satellites](spectre/figures/sphere_star.png)
+
+The star needs a fold with three square holes, which is rare (about 1 patch in 800 at 10 tiles; none with four holes
+turned up in ~1400 patches).  A ring of four also joins correctly (ledger 0) but its closing seam comes out crumpled
+in 3D (`python make_spectre_figures.py --only ring`), so no picture of it is shown here.
+
+    python make_spectre_figures.py          # regenerates all figures above (survey cached in spectre/figures/survey.json)
 
 Results so far: K=60 square holes appear in pairs on 8-12 tiles; no K=0 hexagon and no pentagon pair was found in any
 single-tile, grown-patch or ~5000 random-patch test (the DP is exact, so for those patches there is none).
