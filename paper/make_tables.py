@@ -61,6 +61,22 @@ claims["cube_vs_tetra_order_flips"] = len({cv["cube-6"][1][j] < cv["tetra-4"][1]
 claims["cv_monotone_decreasing_in_tau_beyond_0.3"] = all(a["exposure_cv"] >= b["exposure_cv"] - 1e-9
                                                         for a, b in zip(tau["rows"], tau["rows"][1:]) if a["tau"] >= 0.3)
 claims["seam_length_monotone_in_tau"] = all(a["seam_length"] < b["seam_length"] for a, b in zip(tau["rows"], tau["rows"][1:]))
+
+# ---- Spectre folding section (data/spectre.json from make_spectre_data.py)
+SPF = os.path.join(HERE, "data", "spectre.json")
+sp = json.load(open(SPF)) if os.path.exists(SPF) else None
+if sp:
+    cl = sp["closure"]["rows"]
+    pct = lambda n: cl[str(n)]["closed"] / cl[str(n)]["discs"]
+    sv = sp["survey"]["counts"]
+    claims["spectre_dp_matches_brute_force"] = sp["validate"]["all_agree"]
+    claims["spectre_closure_rate_falls_with_size"] = pct(4) > pct(6) > pct(8) > pct(12) > pct(24)
+    claims["spectre_no_regular_hexagon_hole_in_survey"] = sv["hexagon_regular"] == 0
+    claims["spectre_no_pentagon_pair_in_survey"] = sv["pentagon_pair"] == 0
+    claims["spectre_no_flat_hexagon_of_any_shape_in_survey"] = sv["flat_hexagon_any"] == 0
+    claims["spectre_some_closed_balls_at_19_to_21_tiles"] = any(cl[str(n)]["closed"] > 0 for n in (19, 20, 21))
+    claims["spectre_assembly_ledgers"] = (sp["joins"]["pair_ledger"] == 720 and sp["joins"]["chain3_ledger"] == 720
+                                          and sp["joins"]["ring3_ledger"] == 0)
 print(json.dumps(claims, indent=1))
 json.dump(claims, open(os.path.join(HERE, "data", "claims.json"), "w"), indent=1)
 
@@ -128,5 +144,32 @@ for fk, poly, grad in [("Tetra", balls.poly_tetrahedron(), balls.grad_tetra), ("
     J = balls._edge_jacobian(grad, V[0] + V[1], V[1] - V[0])
     lam = math.sqrt(-np.linalg.det(J))
     m["lim" + fk] = f"{balls.edge_tilt_deg(J / lam, 60):.1f}"
+
+if sp:
+    sv, hb, jn, va = sp["survey"], sp["joins"], sp["joins"], sp["validate"]
+    c = sv["counts"]
+    m.update({
+        "spSurveyDraws": str(sv["draws"]), "spSurveyDiscs": str(c["discs"]), "spSurveyClosed": str(c["closed"]),
+        "spSurveySquare": str(c["square"]), "spSurveySquarePair": str(c["square_pair"]),
+        "spSurveyHex": str(c["hexagon_regular"]), "spSurveyPent": str(c["pentagon_pair"]),
+        "spFlatDraws": str(c["flat_draws"]), "spFlatHex": str(c["flat_hexagon_any"]),
+        "spFlatPatterns": str(sv["n_flat_hexagon_patterns"]),
+        "spNMin": str(sv["n_range"][0]), "spNMax": str(sv["n_range"][1]), "spFlatNMax": str(sv["flat_n_range"][1]),
+        "spHubThreeFound": str(sp["hub3"]["found"]), "spHubThreeDiscs": str(sp["hub3"]["discs"]),
+        "spHubFourFound": str(sp["hub4"]["found"]), "spHubFourDiscs": str(sp["hub4"]["discs"]),
+        "spPairLedger": str(jn["pair_ledger"]), "spChainLedger": str(jn["chain3_ledger"]), "spRingLedger": str(jn["ring3_ledger"]),
+        "spJunctionA": str(jn["pair_junction_deficits"][0]), "spJunctionB": str(jn["pair_junction_deficits"][1]),
+        "spPerN": str(sp["closure"]["per_n"]),
+        "spBruteOne": str(va["one_tile_k4"]["brute"]), "spBruteSix": str(va["one_tile_k6"]["brute"]),
+        "spBruteTwo": str(va["two_tiles_k4"]["brute"]),
+    })
+    cl = sp["closure"]["rows"]
+    rows_ = []
+    for n in (4, 5, 6, 8, 10, 12, 16, 20, 24):
+        r = cl[str(n)]
+        rows_.append(f"{n} & {r['discs']} & {r['closed']} & {100 * r['closed'] / r['discs']:.1f} \\\\")
+    open(os.path.join(HERE, "tables", "spectre_closure.tex"), "w").write(
+        "\\begin{tabular}{@{}rrrr@{}}\n\\toprule\ntiles $N$ & patches & close up & \\% \\\\\n\\midrule\n"
+        + "\n".join(rows_) + "\n\\bottomrule\n\\end{tabular}\n")
 open(os.path.join(HERE, "tables", "numbers.tex"), "w").write("".join(f"\\newcommand{{\\{k}}}{{{v}}}\n" for k, v in m.items()))
 print(m)
