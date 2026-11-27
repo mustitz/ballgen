@@ -1,6 +1,8 @@
 # Trionda Soccer Ball Generator
 
-https://www.scientificamerican.com/article/the-surprising-math-and-physics-behind-the-2026-trionda-world-cup-soccer-ball/
+paper: "The tetrahedral Trionda and the aperiodic Hat Trick on the sphere" B.Hartshorn (2026)
+https://doi.org/10.21203/rs.3.rs-11875344/v1
+
 
 see also: https://github.com/brentharts/hexasphere/
 
@@ -233,3 +235,7 @@ same 40-kite patch outline and differ only in how the five hats cut it up, so wh
 real ball has to be compared by eye (`--variant`, `--mirror`).  (2) Panels are shown with geodesic edges on the unit
 sphere after the relaxation, so hats are slightly strained, not rigid flat polygons.  (3) The pattern is
 periodic under the icosahedral group, so it is a hat *demonstration* ball, not an aperiodic tiling of a sphere.
+
+## References
+- https://www.scientificamerican.com/article/the-surprising-math-and-physics-behind-the-2026-trionda-world-cup-soccer-ball/
+
